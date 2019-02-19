@@ -67,6 +67,11 @@ exports.newVehicle = functions.firestore
       
       return 'complete';
     });
+exports.newEntry = functions.firestore
+    .document('entry-exit-buffer/{timestamp}')
+    .onCreate((snap, context) => {
+      var newValue = snap.data();
+    });
 
 exports.test = functions.https.onRequest((req, res) => {
         res.status(200).send(ret,'yoooooo');
