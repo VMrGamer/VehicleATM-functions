@@ -68,7 +68,7 @@ exports.newVehicle = functions.firestore
       return 'complete';
     });
 exports.newEntry = functions.firestore
-    .document('entry-exit-buffer/{timestamp}')
+    .document('entry-exit-buffer/{rid}')
     .onCreate((snap, context) => {
       var newValue = snap.data();
       var db = admin.firestore();
