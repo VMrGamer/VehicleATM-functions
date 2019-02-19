@@ -92,14 +92,23 @@ exports.newEntry = functions.firestore
                 });
                 return;
               } else if(doc.data().timestamp_exit == 'null'){
-                if(doc.data().rid == 'null'){
-                  unackRef.add(doc.data());
+                var dataDoc = {
+                  rid: doc.data().rid,
+                  timestamp_entry: doc.data().timestamp_entry,
+                  timestamp_exit: newValue.timestamp_entry,
+                  vehicle_no: newValue.vehicle_no
+                };
+                if(dataDoc.rid == 'null'){
+                  unackRef.add(dataDoc);
                 } else {
-                  ackRef.add(doc.data());
+                  ackRef.add(dataDoc);
                 }
+                eebuffRef.doc(doc.id).delete();
+                eebuffRef.doc(snap.id).delete();
               }
             });
           });
+      return "complete";
     });
 
 exports.test = functions.https.onRequest((req, res) => {
