@@ -7,9 +7,11 @@ exports.newVehicle = functions.firestore
       const newValue = snap.data();
       var db = admin.firestore();
       var usersRef = db.collection('users');
-      // This will be the master function for log-vehicle document
+      var logUnAck = db.collection('log-unacknowledged');
+      var logAck = db.collection('log-acknowledged');
 
-      //Check for resident
+      
+
       if(newValue.resident == false){
         var query = usersRef.where('user_type', '==', 'guard').get()
           .then(snapshot => {
@@ -38,9 +40,9 @@ exports.newVehicle = functions.firestore
           }).catch(err =>{
             console.log('Error getting Documents', err);
           });
-      }
-      else{
-        var mUser = 'none';
+      } else{
+        var mUserID = 'none';
+        var mUserRegistrationToken = 'none';
         var query = usersRef.where('user_type', '!=', 'guard').get()
           .then(snapshot =>{
             if(snapshot.empty){
@@ -50,7 +52,10 @@ exports.newVehicle = functions.firestore
             snapshot.forEach(doc =>{
               doc.data().vehicles.forEach(vehicle =>{
                 if(vehicle == newValue.vehicle_no){
+                  mUserID = doc.data().uid;
+                  mUserRegistrationToken = doc.data().token;
                   //do something here
+                  break;
                 }
               });
             });
