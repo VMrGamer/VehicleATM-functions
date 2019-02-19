@@ -7,10 +7,15 @@ exports.newVehicle = functions.firestore
       const newValue = snap.data();
       var db = admin.firestore();
       var usersRef = db.collection('users');
-      var logUnAck = db.collection('log-unacknowledged');
-      var logAck = db.collection('log-acknowledged');
+      var eebuffRef = db.collection('entry-exit-buffer');
 
-      
+      var buffDocData = {
+        rid: 'null',
+        timestamp_entry: 'null',
+        timestamp_exit: newValue.timestamp,
+        vehicle_no: newValue.vehicle_no
+      };
+      eebuffRef.add(buffDocData);
 
       if(newValue.resident == false){
         var query = usersRef.where('user_type', '==', 'guard').get()
@@ -23,7 +28,7 @@ exports.newVehicle = functions.firestore
             snapshot.forEach(doc => {
               var message = {
                 notification: {
-                  title: 'New Non Resient Vehicle Entered',
+                  title: 'Non Resient Vehicle Detected',
                   body: 'Vehicle No: '.concat(newValue.vehicle_no)
                 },
                 token: doc.data().token
@@ -41,8 +46,8 @@ exports.newVehicle = functions.firestore
             console.log('Error getting Documents', err);
           });
       } else{
-        var mUserID = 'none';
-        var mUserRegistrationToken = 'none';
+        var mUserID = [];
+        var mUserRegistrationToken = [];
         var query = usersRef.where('user_type', '!=', 'guard').get()
           .then(snapshot =>{
             if(snapshot.empty){
@@ -52,10 +57,8 @@ exports.newVehicle = functions.firestore
             snapshot.forEach(doc =>{
               doc.data().vehicles.forEach(vehicle =>{
                 if(vehicle == newValue.vehicle_no){
-                  mUserID = doc.data().uid;
-                  mUserRegistrationToken = doc.data().token;
-                  //do something here
-                  break;
+                  mUserID.push(doc.data().uid);
+                  mUserRegistrationToken.push(doc.data().token);
                 }
               });
             });
