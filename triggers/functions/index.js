@@ -11,8 +11,8 @@ exports.newVehicle = functions.firestore
 
       var buffDocData = {
         rid: 'null',
-        timestamp_entry: 'null',
-        timestamp_exit: newValue.timestamp,
+        timestamp_entry: newValue.timestamp,
+        timestamp_exit: 'null',
         vehicle_no: newValue.vehicle_no
       };
       eebuffRef.add(buffDocData);
@@ -71,6 +71,35 @@ exports.newEntry = functions.firestore
     .document('entry-exit-buffer/{timestamp}')
     .onCreate((snap, context) => {
       var newValue = snap.data();
+      var db = admin.firestore();
+      var eebuffRef = db.collection('entry-exit-buffer');
+      var ackRef = db.collection('log-acknowledged');
+      var unackRef = db.collection('log-unacknowledged');
+      var query = eebuffRef.where('vehicle_no', '==', newValue.vehicle_no).get()
+          .then(snapshot =>{
+            if(snapshot.empty){
+              console.log('Document not found');
+              return 'something is wrong';
+            }
+            snapshot.forEach(doc => {
+              if(doc.id == snap.id){
+              } else if(doc.data().timestamp_entry == 'null'){
+                eebuffRef.doc(doc.id).set({
+                  rid: newValue.rid,
+                  timestamp_entry: newValue.timestamp_exit,
+                  timestamp_exit: newValue.timestamp_entry,
+                  vehicle_no: newValue.vehicle_no
+                });
+                return;
+              } else if(doc.data().timestamp_exit == 'null'){
+                if(doc.data().rid == 'null'){
+                  unackRef.add(doc.data());
+                } else {
+                  ackRef.add(doc.data());
+                }
+              }
+            });
+          });
     });
 
 exports.test = functions.https.onRequest((req, res) => {
