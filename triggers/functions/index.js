@@ -14,8 +14,8 @@ exports.newVehicle = functions.firestore
         var query = usersRef.where('user_type', '==', 'guard').get()
           .then(snapshot => {
             if(snapshot.empty){
-              console.log('No Matching Documents.');
-              return 'Somethin Fishy';
+              console.log('No guards founc');
+              return 'you need to add users before contiuning';
             }
 
             snapshot.forEach(doc => {
@@ -39,9 +39,24 @@ exports.newVehicle = functions.firestore
             console.log('Error getting Documents', err);
           });
       }
-
-      //TODO: Get registrationID token here
-      //TODO: Figure out a way to map Resident: true to another function to update the resident history data
+      else{
+        var mUser = 'none';
+        var query = usersRef.where('user_type', '!=', 'guard').get()
+          .then(snapshot =>{
+            if(snapshot.empty){
+              console.log('No normal or poc Users found');
+              return 'you need to add users before contiuning';
+            }
+            snapshot.forEach(doc =>{
+              doc.data().vehicles.forEach(vehicle =>{
+                if(vehicle == newValue.vehicle_no){
+                  //do something here
+                }
+              });
+            });
+          });
+      }
+      
       return 'complete';
     });
 
