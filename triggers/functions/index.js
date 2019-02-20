@@ -111,7 +111,7 @@ exports.newEntry = functions.firestore
       return "complete";
     });
 
-exports.newEntry = functions.firestore
+exports.newRegistration = functions.firestore
     .document('registration/{rid}')
     .onCreate((snap, context) => {
       var newValue = snap.data();
@@ -120,7 +120,47 @@ exports.newEntry = functions.firestore
       var unackRef = db.collection('log-unacknowledged');
       var eebuffRef = db.collection('entry-exit-buffer');
       var query = eebuffRef.where('vehicle_no', '==', newValue.vehicle_no).get()
-          .then(snapshot)
+          .then(snapshot => {
+            if(snapshot.empty){
+              var nestedQuery = ackRef.where('vehicle_no', '==', newValue.vehicle_no).get()
+                  .then(snapshot => {
+                    if(snapshot.empty){
+                      var nestedNestedQuery = unackRef.where('vehicle_no', '==', newValue.vehicle_no).get()
+                          .then(snapshot => {
+                            if(snapshot.empty){
+                              console.log('');
+                              return '';
+                            } 
+                            snapshot.forEach(doc => {
+                              var docData = doc.data();
+                              if(docData.rid == 'null'){
+                                doc.ref.set({
+                                  rid: newValue.rid
+                                }, {merge: true});
+                              }
+                            });
+                          });
+                    }
+                    snapshot.forEach(doc => {
+                      var docData = doc.data();
+                      if(docData.rid == 'null'){
+                        doc.ref.set({
+                          rid: newValue.rid
+                        }, {merge: true});
+                      }
+                    }); 
+                  });
+            } 
+            snapshot.forEach(doc => {
+              var docData = doc.data();
+              if(docData.rid == 'null'){
+                doc.ref.set({
+                  rid: newValue.rid
+                }, {merge: true});
+              }
+            });
+          });
+      return 'completed';
     });
 exports.test = functions.https.onRequest((req, res) => {
         res.status(200).send(ret,'yoooooo');
