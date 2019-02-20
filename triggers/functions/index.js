@@ -111,6 +111,17 @@ exports.newEntry = functions.firestore
       return "complete";
     });
 
+exports.newEntry = functions.firestore
+    .document('registration/{rid}')
+    .onCreate((snap, context) => {
+      var newValue = snap.data();
+      var db = admin.firestore();
+      var ackRef = db.collection('log-acknowledged');
+      var unackRef = db.collection('log-unacknowledged');
+      var eebuffRef = db.collection('entry-exit-buffer');
+      var query = eebuffRef.where('vehicle_no', '==', newValue.vehicle_no).get()
+          .then(snapshot)
+    });
 exports.test = functions.https.onRequest((req, res) => {
         res.status(200).send(ret,'yoooooo');
     });
