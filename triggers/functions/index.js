@@ -119,6 +119,12 @@ exports.newRegistration = functions.firestore
       var ackRef = db.collection('log-acknowledged');
       var unackRef = db.collection('log-unacknowledged');
       var eebuffRef = db.collection('entry-exit-buffer');
+      if(newValue.rid == 'null'){
+        snap.ref.set({
+          rid: snap.id
+        }, {merge: true});
+        newValue = snap.data();
+      }
       var query = eebuffRef.where('vehicle_no', '==', newValue.vehicle_no).get()
           .then(snapshot => {
             if(snapshot.empty){
@@ -135,8 +141,10 @@ exports.newRegistration = functions.firestore
                               var docData = doc.data();
                               if(docData.rid == 'null'){
                                 doc.ref.set({
-                                  rid: newValue.rid
+                                  rid: newValue.rid,
+                                  timestamp_ack: FirebaseFirestore.Timestamp.now()
                                 }, {merge: true});
+                                return 'changed';
                               }
                             });
                           });
@@ -145,8 +153,10 @@ exports.newRegistration = functions.firestore
                       var docData = doc.data();
                       if(docData.rid == 'null'){
                         doc.ref.set({
-                          rid: newValue.rid
+                          rid: newValue.rid,
+                          timestamp_ack: FirebaseFirestore.Timestamp.now()
                         }, {merge: true});
+                        return 'changed';
                       }
                     }); 
                   });
@@ -155,8 +165,10 @@ exports.newRegistration = functions.firestore
               var docData = doc.data();
               if(docData.rid == 'null'){
                 doc.ref.set({
-                  rid: newValue.rid
+                  rid: newValue.rid,
+                  timestamp_ack: FirebaseFirestore.Timestamp.now()
                 }, {merge: true});
+                return 'changed';
               }
             });
           });
