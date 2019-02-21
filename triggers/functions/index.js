@@ -144,8 +144,8 @@ exports.newRegistration = functions.firestore
                               var docData = doc.data();
                               if(docData.rid == 'null'){
                                 doc.ref.set({
-                                  rid: newValue.rid,
-                                  timestamp_ack: admin.firestore.Timestamp.now()
+                                  rid: snap.id,
+                                  timestamp_ack: newValue.timestamp
                                 }, {merge: true});
                                 return 'changed';
                               }
@@ -156,8 +156,8 @@ exports.newRegistration = functions.firestore
                       var docData = doc.data();
                       if(docData.rid == 'null'){
                         doc.ref.set({
-                          rid: newValue.rid,
-                          timestamp_ack: admin.firestore.Timestamp.now()
+                          rid: snap.id,
+                          timestamp_ack: newValue.timestamp
                         }, {merge: true});
                         return 'changed';
                       }
@@ -168,8 +168,8 @@ exports.newRegistration = functions.firestore
               var docData = doc.data();
               if(docData.rid == 'null'){
                 doc.ref.set({
-                  rid: newValue.rid,
-                  timestamp_ack: admin.firestore.Timestamp.now()
+                  rid: snap.id,
+                  timestamp_ack: newValue.timestamp
                 }, {merge: true});
                 return 'changed';
               }
