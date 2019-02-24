@@ -89,7 +89,7 @@ exports.newEntry = functions.firestore
                   rid: newValue.rid,
                   timestamp_entry: newValue.timestamp_exit,
                   timestamp_exit: newValue.timestamp_entry,
-                  timestamp_ack: 'null',
+                  timestamp_ack: doc.data().timestamp_ack,
                   vehicle_no: newValue.vehicle_no
                 });
                 return;
@@ -98,7 +98,7 @@ exports.newEntry = functions.firestore
                   rid: doc.data().rid,
                   timestamp_entry: doc.data().timestamp_entry,
                   timestamp_exit: newValue.timestamp_entry,
-                  timestamp_ack: 'null',
+                  timestamp_ack: doc.data().timestamp_ack,
                   vehicle_no: newValue.vehicle_no
                 };
                 if(dataDoc.rid == 'null'){
