@@ -30,13 +30,26 @@ exports.newVehicle = functions.firestore
               var message = {
                 notification: {
                   title: 'Non Resient Vehicle Detected',
-                  body: 'Vehicle No: '.concat(newValue.vehicle_no)
+                  body: newValue.vehicle_no
+                },
+                data: {
+                  did: snap.id,
+                  snap_link: newValue.snap_link
                 },
                 token: doc.data().token
               };
               admin.messaging().send(message)
                 .then((response) => {
                   console.log('Successfully sent message:', response);
+                  var not_data = {
+                    from_uid: 'admin',
+                    to_uid: doc.data().uid,
+                    did: snap.id,
+                    snap_link: newValue.snap_link,
+                    title: 'Non Resident Vehicle Detected',
+                    message: newValue.vehicle_no
+                  };
+                  db.collection('notification').doc(snap.id).set(not_data);
                 })
                 .catch((error) => {
                   console.log('Error sending message:', error);
