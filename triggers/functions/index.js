@@ -28,11 +28,9 @@ exports.newVehicle = functions.firestore
 
             snapshot.forEach(doc => {
               var message = {
-                notification: {
-                  title: 'Non Resient Vehicle Detected',
-                  body: newValue.vehicle_no
-                },
                 data: {
+                  title: 'Non Resient Vehicle Detected',
+                  body: newValue.vehicle_no,
                   did: snap.id,
                   snap_link: newValue.snap_link
                 },
