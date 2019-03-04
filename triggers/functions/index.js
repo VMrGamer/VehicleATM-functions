@@ -22,7 +22,7 @@ exports.newVehicle = functions.firestore
         var query = usersRef.where('user_type', '==', 'guard').get()
           .then(snapshot => {
             if(snapshot.empty){
-              console.log('No guards founc');
+              console.log('No guards found');
               return 'you need to add users before contiuning';
             }
 
